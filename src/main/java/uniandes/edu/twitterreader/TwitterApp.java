@@ -22,6 +22,7 @@ import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
+import twitter4j.TwitterObjectFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
 /**
@@ -57,7 +58,9 @@ public class TwitterApp {
                 .setOAuthConsumerSecret("dCT2Z85JQ0B9FPafVrbEP26cC4dGduMkQeRT29YIU4Mhl8bhk0")
                 .setOAuthAccessToken("105491840-OzLXnQyvNrpfm7pp6X0b6olTDWKKWmxvdhlQnA2a")
                 .setOAuthAccessTokenSecret("edrCvTf2AOo7xIpuBwFNLY5GS0Dbx35KbFygMzs17hvrY");
-
+        
+        cf.setJSONStoreEnabled(true);
+        
         TwitterFactory tf = new TwitterFactory(cf.build());
         twitter = tf.getInstance();
 
@@ -92,11 +95,11 @@ public class TwitterApp {
                     result = twitter.search(query);
                     List<Status> tweets = result.getTweets();
                     for (Status tweet : tweets) {
-                        String jsonTweet = limpiarJSONparaMongo(tweet.toString());
+                        String jsonTweet = TwitterObjectFactory.getRawJSON(tweet);
                         if (writesFile && writer != null) {
                             writer.println(jsonTweet);
                         }
-                        //mongoCollection.insertOne(Document.parse(jsonTweet));
+                        mongoCollection.insertOne(Document.parse(jsonTweet));
                     }
                 } while ((query = result.nextQuery()) != null);
             }
@@ -110,15 +113,7 @@ public class TwitterApp {
         }
 
     }
-
-    private String limpiarJSONparaMongo(String str) {
-        // quitar encabezado y final
-        str = str.replace("StatusJSONImpl{", "");
-        str = str.substring(0, str.length() - 1);
-        
-        return str;
-    }
-
+    
     public void readMongoDB() {
         MongoCursor cursor = mongoCollection.find().iterator();
         while (cursor.hasNext()) {
