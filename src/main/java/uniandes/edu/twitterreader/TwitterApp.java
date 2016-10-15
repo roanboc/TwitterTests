@@ -96,7 +96,7 @@ public class TwitterApp {
                         if (writesFile && writer != null) {
                             writer.println(jsonTweet);
                         }
-                        mongoCollection.insertOne(Document.parse(jsonTweet));
+                        //mongoCollection.insertOne(Document.parse(jsonTweet));
                     }
                 } while ((query = result.nextQuery()) != null);
             }
