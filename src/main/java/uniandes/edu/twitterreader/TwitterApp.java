@@ -33,7 +33,42 @@ public class TwitterApp {
 
     public static final String[] TWITTER_QUERIES = {
         "#ProcesoDePaz",
-        "#ReformaTributaria"
+        "#ReformaTributaria",
+        "#AcuerdoYa",
+        "@Colombia",
+        "@NoticiasRCN",
+        "@lasillavacia",
+        "@JuanManSantos",
+        "@NoticiasCaracol",
+        "@elheraldoco",
+        "@AlvaroUribeVel",
+        "@mincultura",
+        "@RevistaSemana",
+        "@lafm",
+        "@ClaudiaLopez",
+        "@piedadcordoba",
+        "@petrogustavo",
+        "@ELTIEMPO",
+        "@elespectador",
+        "@infopresidencia",
+        "@CancilleriaCol",
+        "@MauricioCard",
+        "@MinHacienda",
+        "@DanielSamperO",
+        "@gusgomez1701",
+        "@VLADDO",
+        "@VickyDavilaH",
+        "@PirryTv",
+        "@elcolombiano",
+        "@AntanasMockus",
+        "@EnriquePenalosa",
+        "@noticierodelafm",
+        "@NoticiasUno",
+        "@CaracolRadio",
+        "@BluRadioCo",
+        "@HOLLMANMORRIS",
+        "@GusAdolfoOrtiz",
+        "@SFCsupervisor"
     };
 
     private static final String TWEETS_PATH = "tweets.txt";
