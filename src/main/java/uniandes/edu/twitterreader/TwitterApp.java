@@ -35,6 +35,9 @@ public class TwitterApp {
         "#ProcesoDePaz",
         "#ReformaTributaria"
     };
+    
+    public static final String QUERY_SINCE_DATE = "2016-10-16";
+    public static final String QUERY_LAST_DATE = "2016-10-17";
 
     private static final String TWEETS_PATH = "tweets.txt";
 
@@ -90,6 +93,8 @@ public class TwitterApp {
 
             for (String queryString : TWITTER_QUERIES) {
                 Query query = new Query(queryString);
+                query.setSince(QUERY_SINCE_DATE);
+                query.setUntil(QUERY_LAST_DATE);
                 QueryResult result;
                 do {
                     result = twitter.search(query);
@@ -128,7 +133,7 @@ public class TwitterApp {
 
         TwitterApp tapp = new TwitterApp();
         tapp.readColombiaTopics(true);
-        tapp.readMongoDB();
+        //tapp.readMongoDB();
 
     }
 
