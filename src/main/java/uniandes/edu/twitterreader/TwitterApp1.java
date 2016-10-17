@@ -67,7 +67,7 @@ public class TwitterApp1 {
         Twitter twitter = new TwitterFactory(cf.build()).getInstance();
         for (String queryString : TWITTER_QUERIES) {
             System.out.println(queryString);
-            Query query = new Query(queryString);
+            Query query = new Query(queryString);            
             QueryResult result = twitter.search(query);
              List<Status> tweets = result.getTweets();
             for (Status tweet : tweets) {
