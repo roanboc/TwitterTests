@@ -32,47 +32,15 @@ import twitter4j.conf.ConfigurationBuilder;
 public class TwitterApp {
 
     public static final String[] TWITTER_QUERIES = {
-        "#ProcesoDePaz",
-        "#ReformaTributaria",
+//        "#ProcesoDePaz"
+//        ,"#ReformaTributaria"
+//        ,"#PazSinReformaTributaria"
+//        ,"#ReformaTributaria2016"
         "#AcuerdoYa"
-//        ,"@Colombia",
-//        "@NoticiasRCN",
-//        "@lasillavacia",
-//        "@JuanManSantos",
-//        "@NoticiasCaracol",
-//        "@elheraldoco",
-//        "@AlvaroUribeVel",
-//        "@mincultura",
-//        "@RevistaSemana",
-//        "@lafm",
-//        "@ClaudiaLopez",
-//        "@piedadcordoba",
-//        "@petrogustavo",
-//        "@ELTIEMPO",
-//        "@elespectador",
-//        "@infopresidencia",
-//        "@CancilleriaCol",
-//        "@MauricioCard",
-//        "@MinHacienda",
-//        "@DanielSamperO",
-//        "@gusgomez1701",
-//        "@VLADDO",
-//        "@VickyDavilaH",
-//        "@PirryTv",
-//        "@elcolombiano",
-//        "@AntanasMockus",
-//        "@EnriquePenalosa",
-//        "@noticierodelafm",
-//        "@NoticiasUno",
-//        "@CaracolRadio",
-//        "@BluRadioCo",
-//        "@HOLLMANMORRIS",
-//        "@GusAdolfoOrtiz",
-//        "@SFCsupervisor"
     };
     
-    public static final String QUERY_SINCE_DATE = "2016-10-11";
-    public static final String QUERY_LAST_DATE = "2016-10-12";
+    public static final String QUERY_SINCE_DATE = "2016-10-23";
+    public static final String QUERY_LAST_DATE = "2016-10-24";
 
     private static final String TWEETS_PATH = "tweets.txt";
 
@@ -160,6 +128,17 @@ public class TwitterApp {
             System.out.println("Cursor: " + cursor.next());
         }
     }
+    
+    public void getMongoFunctionResults(String functionStringWithParameters){
+        Document doc2 = mongoDB.runCommand(new Document("$eval", functionStringWithParameters));
+        String collectionResults = doc2.getString("retval");
+        
+        MongoCursor cursor = mongoDB.getCollection(collectionResults).find().iterator();
+        while (cursor.hasNext()) {
+            System.out.println(cursor.next());
+            // Guarde en Array y trate los datos como requiera
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -167,9 +146,10 @@ public class TwitterApp {
     public static void main(String[] args) {
 
         TwitterApp tapp = new TwitterApp();
-        tapp.readColombiaTopics(true);
+        //tapp.readColombiaTopics(true);
         //tapp.readMongoDB();
-
+        tapp.getMongoFunctionResults("getRelevantUsers()");
+        
     }
 
 }
