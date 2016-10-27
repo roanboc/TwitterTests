@@ -12,9 +12,12 @@ import com.mongodb.client.MongoDatabase;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.bson.Document;
 import twitter4j.Query;
 import twitter4j.QueryResult;
@@ -24,6 +27,7 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.TwitterObjectFactory;
 import twitter4j.conf.ConfigurationBuilder;
+import uniandes.edu.util.MongoDataRecord;
 
 /**
  *
@@ -32,15 +36,15 @@ import twitter4j.conf.ConfigurationBuilder;
 public class TwitterApp {
 
     public static final String[] TWITTER_QUERIES = {
-//        "#ProcesoDePaz"
-//        ,"#ReformaTributaria"
-//        ,"#PazSinReformaTributaria"
-//        ,"#ReformaTributaria2016"
-        "#AcuerdoYa"
+        "#ProcesoDePaz"
+        ,"#ReformaTributaria"
+        ,"#PazSinReformaTributaria"
+        ,"#ReformaTributaria2016"
+//        "#AcuerdoYa"
     };
     
-    public static final String QUERY_SINCE_DATE = "2016-10-23";
-    public static final String QUERY_LAST_DATE = "2016-10-24";
+    public static final String QUERY_SINCE_DATE = "2016-10-25";
+    public static final String QUERY_LAST_DATE = "2016-10-27";
 
     private static final String TWEETS_PATH = "tweets.txt";
 
@@ -54,6 +58,8 @@ public class TwitterApp {
 
     private final MongoDatabase mongoDB;
     private final MongoCollection mongoCollection;
+    
+    private final List<MongoDataRecord> mongoResults = new ArrayList<>();
 
     public TwitterApp() {
 
@@ -122,21 +128,46 @@ public class TwitterApp {
 
     }
     
-    public void readMongoDB() {
-        MongoCursor cursor = mongoCollection.find().iterator();
-        while (cursor.hasNext()) {
-            System.out.println("Cursor: " + cursor.next());
-        }
-    }
-    
     public void getMongoFunctionResults(String functionStringWithParameters){
         Document doc2 = mongoDB.runCommand(new Document("$eval", functionStringWithParameters));
         String collectionResults = doc2.getString("retval");
         
+        mongoResults.clear();
+        
         MongoCursor cursor = mongoDB.getCollection(collectionResults).find().iterator();
+        
         while (cursor.hasNext()) {
-            System.out.println(cursor.next());
-            // Guarde en Array y trate los datos como requiera
+            String resultString = cursor.next().toString();
+            
+            // obtener propiedades del resultado
+            String hashtag = getValueFromMongoResult(resultString, "hashtag", false),
+                user = getValueFromMongoResult(resultString, "user", false),
+                date = getValueFromMongoResult(resultString, "date", false),
+                sentiment = getValueFromMongoResult(resultString, "sentiment", false);
+            
+            float tweets = Float.parseFloat(getValueFromMongoResult(resultString, "totalTweets", true)), 
+                retweets = Float.parseFloat(getValueFromMongoResult(resultString, "totalReTweet", true)), 
+                followers = Float.parseFloat(getValueFromMongoResult(resultString, "totalFollowers", true));
+            
+            mongoResults.add(new MongoDataRecord(hashtag, user, date, sentiment, tweets, retweets, followers));
+            
+            System.out.println(hashtag + "|" + user + "|" +  date + "|" +  sentiment + "|" +  tweets + "|" +  retweets + "|" +  followers);
+        }
+    }
+    
+    public String getValueFromMongoResult(String mongoResult, String property, boolean returnsNumberIfNoExists){
+        
+        Pattern regexItems = Pattern.compile("(?s)(?<=" + property + "=).+?(?=,|})");
+        Matcher mItems = regexItems.matcher(mongoResult);
+        
+        if (mItems.find()) {
+            return mItems.group(0);
+        }else{
+            if(returnsNumberIfNoExists){
+                return "0";
+            }else{
+                return "";
+            }
         }
     }
 
@@ -147,9 +178,10 @@ public class TwitterApp {
 
         TwitterApp tapp = new TwitterApp();
         //tapp.readColombiaTopics(true);
-        //tapp.readMongoDB();
-        tapp.getMongoFunctionResults("getRelevantUsers()");
+        String regexAll = "\".\"";
+        tapp.getMongoFunctionResults("getGeneralInfo(" + regexAll + ", " + regexAll + ")");
         
+        // fecha, tema, sentimiento, user.followers_count
     }
 
 }
